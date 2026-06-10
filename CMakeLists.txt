@@ -20,3 +20,14 @@ include_directories(${GTEST_INCLUDE_DIRS})
 add_executable(run_tests tests/test_main.cpp src/parser.cpp src/stats_engine.cpp src/tick_queue.cpp)
 target_link_libraries(run_tests ${GTEST_LIBRARIES} pthread)
 target_include_directories(run_tests PRIVATE include)
+
+# benchmarking
+add_executable(benchmark
+	src/benchmark.cpp
+	src/parser.cpp
+	src/stats_engine.cpp
+	src/tick_queue.cpp
+	src/pipeline.cpp
+)
+target_include_directories(benchmark PRIVATE include)
+target_link_libraries(benchmark pthread)
