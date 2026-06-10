@@ -2,6 +2,9 @@
 #include "tick.h"
 #include <fstream>
 
+#include "stats_engine.h"
+#include <cmath>
+
 // Make temp file to ensure parsing is correct
 TEST(ParserTest, ParsesValidRows) {
 	std::ofstream tmp("/tmp/test_ticks.csv");
@@ -28,6 +31,57 @@ TEST(ParserTest, SkipsMalformedRows) {
 	auto ticks = parse_csv("/tmp/test_bad.csv");
 
 	EXPECT_EQ(ticks.size(), 2);
+}
+
+TEST(StatsEngineTest, MeanIsCorrect) {
+	RollingStatistics stats(3);
+	stats.update(10.0);
+	stats.update(20.0);
+	stats.update(30.0);
+
+	EXPECT_NEAR(stats.mean(), 20.0, 1e-9);
+}
+
+TEST(StatsEngineTest, StddevIsCorrect) {
+	RollingStatistics stats(4);
+	stats.update(2.0);
+	stats.update(4.0);
+	stats.update(4.0);
+	stats.update(4.0);
+	stats.update(5.0);
+	stats.update(5.0);
+	stats.update(7.0);
+	stats.update(9.0);
+	
+	EXPECT_NEAR(stats.stddev(), 2.0, 1e-6);
+}
+
+TEST(StatsEngineTest, ZscoreDetectsAnomaly) {
+    RollingStatistics stats(5);
+
+    for (int i = 0; i < 100; i++) {
+        stats.update(i%2==0 ? 99.0 : 101.0);
+    }
+
+    double z = stats.zscore(200.0);
+    EXPECT_GT(z, 3.0);
+}
+
+TEST(StatsEngineTest, NotReadyUntilWindowFilled) {
+    RollingStatistics stats(10);
+
+    for (int i = 0; i < 9; i++) {
+        stats.update(1.0);
+        EXPECT_FALSE(stats.is_ready());
+    }
+
+    stats.update(1.0);
+    EXPECT_TRUE(stats.is_ready());
+}
+
+TEST(StatsEngineTest, ThrowsOnWindowSizeLessThanTwo) {
+    EXPECT_THROW(RollingStatistics(1), std::runtime_error);
+    EXPECT_THROW(RollingStatistics(0), std::runtime_error);
 }
 
 int main(int argc, char **argv) {
