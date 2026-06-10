@@ -5,6 +5,10 @@
 #include "stats_engine.h"
 #include <cmath>
 
+#include "tick_queue.h"
+#include <thread>
+#include <atomic>
+
 // Make temp file to ensure parsing is correct
 TEST(ParserTest, ParsesValidRows) {
 	std::ofstream tmp("/tmp/test_ticks.csv");
@@ -82,6 +86,37 @@ TEST(StatsEngineTest, NotReadyUntilWindowFilled) {
 TEST(StatsEngineTest, ThrowsOnWindowSizeLessThanTwo) {
     EXPECT_THROW(RollingStatistics(1), std::runtime_error);
     EXPECT_THROW(RollingStatistics(0), std::runtime_error);
+}
+
+TEST(TickQueueTest, ProducerConsumerDeliversAllTicks) {
+    TickQueue queue(10);
+    const int NUM_TICKS = 1000;
+
+    std::atomic<int> received(0);
+
+    std::thread prod([&] {
+        for (int i = 0; i < NUM_TICKS; i++) {
+            Tick t;
+            t.price = static_cast<double>(i);
+            t.quantity = 1.0;
+            t.timestamp_ms = i;
+            queue.push(t);
+        }
+        queue.set_done();
+    });
+
+    std::thread cons([&] {
+        while (true) {
+            auto tick = queue.pop();
+            if (!tick.has_value()) break;
+            received++;
+        }
+    });
+
+    prod.join();
+    cons.join();
+
+    EXPECT_EQ(received.load(), NUM_TICKS);
 }
 
 int main(int argc, char **argv) {
