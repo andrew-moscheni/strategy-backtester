@@ -1,26 +1,13 @@
-#include <iostream>
-#include <thread>
-#include "tick_queue.h"
-#include "stats_engine.h"
-#include "pipeline.h"
+#include <curl/curl.h>
+#include <string.h>
 
-int main() {
-    std::string filepath = "../data/BTCUSDT-trades-2024-01-15.csv";
+//define globals locally here (DISABLE WHEN COMMITTING)
+auto API_URL = "";
+auto API_KEY = "";
+auto API_SECRET_KEY = "";
 
-    TickQueue queue(1000);
 
-    RollingStatistics stats(500);
+int main(int argc, char* argv[]){
 
-    std::thread producer_thread([&] {
-        producer(filepath, queue);
-    });
-
-    std::thread consumer_thread([&] {
-        consumer(queue, stats);
-    });
-    producer_thread.join();
-    consumer_thread.join();
-
-    std::cout << "\nPipeline complete." << std::endl;
     return 0;
 }

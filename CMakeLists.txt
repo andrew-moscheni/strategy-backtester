@@ -8,26 +8,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # turn on warnings
 add_compile_options(-Wall -Wextra -O2)
 
-add_executable(tick_processor src/main.cpp src/parser.cpp src/stats_engine.cpp src/tick_queue.cpp src/pipeline.cpp)
+add_executable(tick_processor src/main.cpp)
 target_link_libraries(tick_processor pthread)
 target_include_directories(tick_processor PRIVATE include)
 
 # test setup
-find_package(GTest REQUIRED)
-include_directories(${GTEST_INCLUDE_DIRS})
+#find_package(GTest REQUIRED)
+#include_directories(${GTEST_INCLUDE_DIRS})
 
 # test the executable
-add_executable(run_tests tests/test_main.cpp src/parser.cpp src/stats_engine.cpp src/tick_queue.cpp)
-target_link_libraries(run_tests ${GTEST_LIBRARIES} pthread)
-target_include_directories(run_tests PRIVATE include)
+#add_executable(run_tests tests/test_main.cpp)
+#target_link_libraries(run_tests ${GTEST_LIBRARIES} pthread)
+#target_include_directories(run_tests PRIVATE include)
 
 # benchmarking
 add_executable(benchmark
 	src/benchmark.cpp
-	src/parser.cpp
-	src/stats_engine.cpp
-	src/tick_queue.cpp
-	src/pipeline.cpp
 )
 target_include_directories(benchmark PRIVATE include)
 target_link_libraries(benchmark pthread)
