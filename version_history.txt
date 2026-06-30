@@ -1,0 +1,24 @@
+Strategy Backtester (formerly Tick Processor) Version History
+
+Version 1.0.0
+
+A C++17 program that transformed financial data from Binance
+into a dashboard of metrics dervied from 24 popular stocks. To
+be used as a sandbox to test implementations of the most current
+research in quantitative finance. Ultimately scrapped because 
+of a lack of streaming capabilities in favor of a 
+client-producer model using Alpaca's API.
+
+Version 2.0.0
+
+A C++17 program that extracted data from Alpaca's API to dervie
+Greeks and other metrics from. Ultimately scrapped once, upon
+further research, it was found to not stream data by hour but
+by day in the smallest increments, eliminating a perceived 
+advantage over Python's yfinance.
+
+Version 3.0.0
+
+A Python program that takes data from Yahoo Finance and is 
+to be used as a sandbox to test the most recent research in the
+quantitative finance field. 
